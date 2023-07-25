@@ -1,0 +1,76 @@
+############## Data segment ######
+.data
+buf: .space 21
+buf1: .space 20
+
+msg: .asciiz "\n please enter up to 20 characters\n"
+Identical: .asciiz " \n The number of identical char in a row is :  "
+
+############# code segment ##########
+.text
+
+main:
+	li $v0,4
+	la,$a0,msg
+	syscall		#print msg
+	
+	li $v0,8
+	la $a0,buf    #adress
+	li $a1,21     # max charecter
+	syscall
+	
+
+	li $t0,-1      # string counter
+	li $t1,0      # counter next char
+	li $v1,0	# identical counter
+loop:
+	add $t0,$t0,1
+	add $t1,$t1,1	
+	beq $t1,20,exit		# end of array
+	
+	lb $t2,buf($t0)		# t2 = buf[t0]
+	lb $t3,buf($t1)		# t3 = buf[t1]
+	beq $t3,'\n',exit	# enter char 
+	
+	blt $t2,$t3,minus	# if t2 < t3
+	bgt $t2,$t3,plus	# if t2 > t3
+	#else 
+	addi $v1,$v1,1		# t2=t3 => v1++	
+	li $t8,'='
+	sb $t8,buf1($t0)	# buf1[t0] = '='
+	
+	j loop
+	
+minus:
+	li $t8,'-'
+	sb $t8,buf1($t0)
+	j loop
+	
+plus : 
+	li $t8,'+'
+	sb $t8,buf1($t0)
+	j loop
+	
+	
+exit:
+	li $v0,4	
+	la $a0,buf1	#print buf1
+	syscall
+	
+	li $v0,4
+	la $a0,Identical # print identical massage
+	syscall 
+	
+	li $v0,1
+	move $a0,$v1	# print number of identical
+	syscall
+	
+	li $v0,10	# exit
+	syscall
+		  	  
+		  	  	  
+		  	  	  	  
+		  	  	  	  	  
+		  	  	  	  	  	  
+		  	  	  	  	  	  	  
+		  	  	  	  	  	  	  	  	  
